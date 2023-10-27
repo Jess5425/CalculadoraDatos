@@ -11,17 +11,16 @@ public class ExpressionTree {
     Pila operandoStack;
 
 
-
-    public ExpressionTree(NodoArbol a){
-        this.root=a;
-        this.left=null;
-        this.right=null;
+    public ExpressionTree(NodoArbol a) {
+        this.root = a;
+        this.left = null;
+        this.right = null;
     }
 
-    public ExpressionTree(){
-        this.root=null;
-        this.left=null;
-        this.right=null;
+    public ExpressionTree() {
+        this.root = null;
+        this.left = null;
+        this.right = null;
 
         this.operators = new StringArray(6); // Initialize operators array
         this.opLogicos = new StringArray(4); // Initialize opLogicos array
@@ -32,79 +31,80 @@ public class ExpressionTree {
         opLogicos.insertAll("&", "|", "^", "~");
     }
 
-    private void creaArbol(Lista caracteres){ // cambiar return nodoarbol ,quiero que me cree un nodo dada una lista de caracteres
-        System.out.println("creaArbol");
-        NodoArbol current = caracteres.getFirst();
-        while (current !=null){
-            revisaCaracter(current);
-            current=current.next;
-        }
-
-    }
-
-    private void evalue(Lista caracteres){
+    private void evalue(Lista caracteres) {
         System.out.println("evalue");
-        Lista nodosYOperadores = procesarParentesis(caracteres);
-        creaArbol(nodosYOperadores);
+        Lista nodosOperandos = procesarParentesis(caracteres);
+        creaArbol(nodosOperandos);
     }
 
-    private Boolean isOperator(StringArray conjunto, NodoArbol c){ //Método que revisa si es operator
-        System.out.println("isOperator");
+    private NodoArbol creaArbol(Lista caracteres) {
+        System.out.println("creaArbol");
+        //llamo procesaParentesis, me da una lista
+        Lista sinParentesis = procesarParentesis(caracteres);
+        //llamo procesaCaracteres en la lista
+        Lista sinOperandos = procesaCaracteres(sinParentesis);
+        //Tomo lista de operadores y hago el árbol
+        NodoArbol resultNode = operatorHandler(sinOperandos);
+
+
+        // Assuming you have a way to get the root node of the tree
+        return resultNode;  // Replace rootNode with the actual root node
+    }
+
+
+    private Boolean isOperator(StringArray conjunto, NodoArbol c) { //Método que revisa si es operator
+        System.out.println(c.data);
         for (int i = 0; i < conjunto.getSize(); i++) {
-            if (conjunto.get(i).equals(c.data)){
+            if (conjunto.get(i).equals(c.data)) {
                 return true;
             }
         }
         return false;
     }
 
-    private void revisaCaracter(NodoArbol c) {
-        NodoArbol start = c;
-        boolean hayOperando = false;
+    private Lista procesaCaracteres(Lista listaParentesis) {
+        NodoArbol c = listaParentesis.getFirst();
+        Lista soloOperator = new Lista();
 
         while (c != null) {
+
             if (!isOperator(operators, c)) {
+
                 operandoStack.push(c);
 
-                if (c == start) {
-                    start = c.next;
-                } else {
-                    NodoArbol previous = getPrevious(start, c);
-                    previous.next = c.next;
-                }
-
-                NodoArbol nextNode = c.next;  // Store the next node in a variable
-                if (nextNode != null) {  // Add a null check here
-                    nextNode.prev = c.prev;
-                }
-
-                c = nextNode;  // Update c to the next node
-                hayOperando = true;
-            } else {
-                c = c.next;
             }
+            if (isOperator(operators, c)) {
+                soloOperator.insertNode(c);
+            }
+            c = c.next;
         }
 
-        if (hayOperando) {
-            revisaCaracter(start);
-        } else if (start != null) {
-            operatorHandler(start);
-        }
+        return soloOperator;
     }
 
 
 
 
 
-
-    private void operatorHandler(NodoArbol op) {
+    private NodoArbol operatorHandler(Lista listaOperando) {
+        NodoArbol op = listaOperando.getLast();
         NodoArbol resultNode = new NodoArbol();
+
+        while (op.prev!=null){
+            constructor(op);
+            operandoStack.push(op);
+        }
         resultNode.data = op.data;
-        resultNode.left = op.right;  // The right operand is the left child of the result node
-        resultNode.right = op.left;  // The left operand is the right child of the result node
-        operandoStack.push(resultNode);
+        resultNode.left = operandoStack.pop();
+        resultNode.right = operandoStack.pop();
+        return resultNode;
+
     }
 
+    private void constructor(NodoArbol op) {
+        op.right = operandoStack.pop();
+        op.left = operandoStack.pop();
+    }
 
 
     private Lista procesarParentesis(Lista expresion) {
@@ -113,13 +113,21 @@ public class ExpressionTree {
         NodoArbol current = expresion.getFirst();
         NodoArbol start = null;
         NodoArbol end = null;
+        int count=0;
 
         // Itera a través de los nodos de la expresión
         while (current != null) {
+            System.out.println("while current!=null");
+            System.out.println("current = "+ current.data);
+            if (start!=null){
+                System.out.println("start = " + start.data);
+            }
             if (current.data.equals("(")) {  // Si el nodo actual es un paréntesis abierto:
-                start = current;  // Marca este nodo como el inicio del paréntesis.
+                start = current;// Marca este nodo como el inicio del paréntesis.
+                count++;
             } else if (current.data.equals(")")) {  // Si el nodo actual es un paréntesis cerrado:
                 end = current;  // Marca este nodo como el fin del paréntesis.
+                count--;
                 break;
             }
             current = current.next;
@@ -127,19 +135,23 @@ public class ExpressionTree {
 
         // Si se encontraron un par de paréntesis válido
         if (start != null && end != null) {
+            System.out.println("encuentra par de parentesis ");
             // Extrae la subexpresión entre los paréntesis
-            Lista subExpression = extractSubExpression(start, end);
+            Lista subExpression = extractSubexpression(start, end);
+            //subExpression.display();
 
             // Crea un árbol de expresión para la subexpresión
-            creaArbol(subExpression);
+
+            NodoArbol subArbol = creaArbol(subExpression);
+
 
             // Si el paréntesis estaba al inicio de la expresión
             if (start == expresion.getFirst()) {
-                expresion.insertNode(subExpression.getFirst());  // Inserta la subexpresión en la lista original.
+                expresion.insertNode(subArbol);  // Inserta la subexpresión en la lista original.
             } else {
                 // Encuentra el nodo anterior al inicio de la subexpresión
                 NodoArbol previous = getPrevious(expresion.getFirst(), start);
-                previous.next = subExpression.getFirst();  // Conecta el nodo anterior al inicio de la subexpresión.
+                previous.next = subArbol;  // Conecta el nodo anterior al inicio de la subexpresión.
             }
 
             // Conecta el último nodo de la subexpresión al siguiente después del paréntesis cerrado
@@ -151,31 +163,36 @@ public class ExpressionTree {
             }
 
             // Llamada recursiva para procesar más paréntesis.
-            return procesarParentesis(expresion);
+            if (count!=0){
+                return procesarParentesis(expresion);
+            }
+            // AQUI ESTÁ EL ERROR DEL LOOP PARENTESIS
         }
 
         return expresion;  // Retorna la lista de expresión actualizada.
     }
 
+    public Lista extractSubexpression(NodoArbol start, NodoArbol end) {
+        Lista subexpressionList = new Lista();
+        NodoArbol current = start.next; // Skip the first character (opening parenthesis)
 
-    private Lista extractSubExpression(NodoArbol start, NodoArbol end) {
-        System.out.println("extractSub");
-        NodoArbol current = start;
-        Lista temporal = new Lista();
-        while (current.next != null) {
-            temporal.insertNode(current);
+        while (current != null && current != end) {
+            NodoArbol newNode = new NodoArbol();
+            newNode.data = current.data;
+            subexpressionList.insertNode(newNode);
             current = current.next;
         }
 
-        if (start.prev != null) {
-            start.prev.next = null; // quita las referencias a la subexpresión
+        if (current == null) {
+            System.out.println("Error: End node not found in the list.");
+            return null; // Handle this case based on your application's requirements
         }
-        if (end.next != null) {
-            end.next.prev = null;
-        }
-        end.next = null;
-        return temporal;
+
+        return subexpressionList;
     }
+
+
+
 
 
     private NodoArbol getPrevious(NodoArbol current, NodoArbol target) {

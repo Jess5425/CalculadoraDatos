@@ -32,7 +32,7 @@ public class Lista {
     public void insertNode(NodoArbol dataNode) {
         if (dataNode == null) {
             System.out.println("Error: Attempted to insert a null node.");
-            return; // Optionally handle this case based on your application's requirements
+            return; //
         }
 
         if (tail == null) {
