@@ -12,12 +12,10 @@ public class corre {
 
 //        opLogicos.insertAll("&", "|", "^", "~");
 //        operandos.insertAll("+", "-", "*", "/", "%", "**");
-        expresion.insert("(x+(y-z))"); // aquí luego cambia por el input del usuario
+        expresion.insert("(x+(y*z))"); // aquí luego cambia por el input del usuario
         ExpressionTree tree = new ExpressionTree();
         //hasta aqui sirve el código
         tree.evalueLista(expresion);
-        System.out.println("7");
         tree.printTree(tree.root, 0);
-        System.out.println("8");
     }
 }
