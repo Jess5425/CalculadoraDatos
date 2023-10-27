@@ -23,11 +23,6 @@ public class Pantalla extends JFrame {
     public double primerNumero, resultado;
     public boolean activado = true;
     public boolean punto = true;
-
-    //ScriptEngineManager sem = new ScriptEngineManager();
-    //ScriptEngine se = sem.getEngineByName("JavaScript");
-
-
     private JPanel PanelVisual = new JPanel();
     private JLabel labelOperation = new JLabel();
     private JLabel LabelResult = new JLabel();
@@ -85,7 +80,7 @@ public class Pantalla extends JFrame {
     }
 
 
-// ... AGREGAR BOTONES
+// Aquí empiezan los botones
 
 
     JButton btnSuma = new JButton("+");
@@ -109,6 +104,7 @@ public class Pantalla extends JFrame {
                     operacion="sumar";
 
                     activado= false;
+
 
                 }
             }
@@ -136,6 +132,7 @@ public class Pantalla extends JFrame {
 
                         activado= false;
 
+
                     }
                 }
             });
@@ -161,6 +158,7 @@ public class Pantalla extends JFrame {
                             operacion="dividir";
 
                             activado= false;
+
 
                         }
                     }
@@ -189,6 +187,7 @@ public class Pantalla extends JFrame {
 
                                 activado= false;
 
+
                             }
                         }
                     });
@@ -207,6 +206,14 @@ public class Pantalla extends JFrame {
                         btnXor.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 // Maneja el evento del botón aquí
+                                if(activado==true) {
+                                    primerNumero = Double.parseDouble(cadenaNumeros);
+                                    labelOperation.setText(cadenaNumeros + " ^ ");
+                                    cadenaNumeros = "";
+                                    operacion = "xor";
+
+                                    activado = false;
+                                }
                                 addNumber("^");
                             }
                         });
@@ -317,7 +324,15 @@ public class Pantalla extends JFrame {
                                             btnNot.setBounds(265, 85, 40, 39);
                                             btnNot.addActionListener(new ActionListener() {
                                                 public void actionPerformed(ActionEvent evt) {
-                                                    // Maneja el evento del botón aquí
+                                                    if(activado==true){
+                                                        primerNumero= Double.parseDouble(cadenaNumeros);
+                                                        labelOperation.setText(cadenaNumeros+" ~ ");
+                                                        cadenaNumeros="";
+                                                        operacion="not";
+
+                                                        activado= false;
+
+                                                    }
                                                     addNumber("~");
                                                 }
                                             });
@@ -429,7 +444,15 @@ public class Pantalla extends JFrame {
                                                                 btnOr.setBounds(265, 145, 40, 39);
                                                                 btnOr.addActionListener(new ActionListener() {
                                                                     public void actionPerformed(ActionEvent evt) {
-                                                                        // Maneja el evento del botón aquí
+                                                                        if(activado==true){
+                                                                            primerNumero= Double.parseDouble(cadenaNumeros);
+                                                                            labelOperation.setText(cadenaNumeros+" | ");
+                                                                            cadenaNumeros="";
+                                                                            operacion="or";
+
+                                                                            activado= false;
+
+                                                                        }
                                                                         addNumber("|");
                                                                     }
                                                                 });
@@ -448,8 +471,13 @@ public class Pantalla extends JFrame {
                                                                     btnElim.addActionListener(new ActionListener() {
                                                                         public void actionPerformed(ActionEvent evt) {
                                                                             // Maneja el evento del botón aquí
-                                                                            LabelResult.setText("");
+                                                                            LabelResult.setText("0");
                                                                             labelOperation.setText("");
+                                                                            operacion= "nula";
+                                                                            cadenaNumeros="";
+                                                                            activado= true;
+                                                                            punto=true;
+
                                                                             System.out.println("Presionamos el botón eliminar");
                                                                         }
                                                                     });
@@ -543,6 +571,16 @@ public class Pantalla extends JFrame {
                                                                                     btnAnd.addActionListener(new ActionListener() {
                                                                                         public void actionPerformed(ActionEvent evt) {
                                                                                             // Maneja el evento del botón aquí
+                                                                                            if(activado==true){
+                                                                                                primerNumero= Double.parseDouble(cadenaNumeros);
+                                                                                                labelOperation.setText(cadenaNumeros+" & ");
+                                                                                                cadenaNumeros="";
+                                                                                                operacion="and";
+
+                                                                                                activado= false;
+
+                                                                                            }
+
                                                                                             addNumber("&");
                                                                                         }
                                                                                     });
@@ -565,7 +603,7 @@ public class Pantalla extends JFrame {
                                                                                         });
                                                                                         PanelNum.add(btnScan);
 
-                                                                                        JButton btnPunto = new JButton(",");
+                                                                                        JButton btnPunto = new JButton(".");
                                                                                         {
                                                                                             btnPunto.setFont(new Font("Rockwell", Font.PLAIN, 18));
                                                                                             btnPunto.setBackground(new Color(210, 241, 233));
@@ -578,6 +616,15 @@ public class Pantalla extends JFrame {
                                                                                             btnPunto.addActionListener(new ActionListener() {
                                                                                                 public void actionPerformed(ActionEvent evt) {
                                                                                                     // Maneja el evento del botón aquí
+                                                                                                    if(punto==true){
+                                                                                                        if(cadenaNumeros.equals("")){
+                                                                                                            cadenaNumeros= "0.";
+                                                                                                        }else{
+                                                                                                            cadenaNumeros+=".";
+                                                                                                        }
+                                                                                                        LabelResult.setText(cadenaNumeros);
+                                                                                                        punto= false;
+                                                                                                    }
                                                                                                     addNumber(".");
                                                                                                 }
                                                                                             });
@@ -659,15 +706,7 @@ public class Pantalla extends JFrame {
                                                                                                             public void actionPerformed(ActionEvent evt) {
 
                                                                                                                 // Maneja el evento del botón aquí
-                                                                                                                /**
-                                                                                                                try {
-                                                                                                                    String resultado = se.eval(labelOperation.getText()).toString();
-                                                                                                                    LabelResult.setText(resultado);
-                                                                                                                } catch (
-                                                                                                                        Exception e) {
-                                                                                                                    labelOperation.setText("Error");
-                                                                                                                }
-                                                                                                                 */
+
                                                                                                                 double segundoNumero;
                                                                                                                 if(operacion.equals("nula")){
                                                                                                                     LabelResult.setText(cadenaNumeros);
@@ -699,17 +738,56 @@ public class Pantalla extends JFrame {
                                                                                                                 }
                                                                                                                 else if(operacion.equals("dividir")) {
                                                                                                                     segundoNumero = Double.parseDouble(cadenaNumeros);
-                                                                                                                    if (segundoNumero==0){
+                                                                                                                    if (segundoNumero == 0) {
                                                                                                                         LabelResult.setText("Error");
-                                                                                                                    }else{
+                                                                                                                    } else {
                                                                                                                         resultado = primerNumero / segundoNumero;
                                                                                                                         LabelResult.setText(String.format("%.2f", resultado));
                                                                                                                         cadenaNumeros = String.valueOf(resultado);
                                                                                                                         operacion = "nula";
                                                                                                                     }
+                                                                                                                } else if (operacion.equals("and")) {
+                                                                                                                    boolean primerValor = cadenaNumeros.equals("1");
+                                                                                                                    boolean segundoValor = primerNumero == 1.0;
+                                                                                                                    boolean resultadoAnd = primerValor && segundoValor;
+                                                                                                                    LabelResult.setText(String.valueOf(resultadoAnd));
+                                                                                                                    cadenaNumeros = resultadoAnd ? "1" : "0";
+                                                                                                                    operacion = "nula";
+
+                                                                                                                }else if (operacion.equals("xor")) {
+                                                                                                                    boolean primerValor = cadenaNumeros.equals("1");
+                                                                                                                    boolean segundoValor = primerNumero == 1.0;
+                                                                                                                    boolean resultadoXor = primerValor ^ segundoValor;
+                                                                                                                    LabelResult.setText(String.valueOf(resultadoXor));
+                                                                                                                    cadenaNumeros = resultadoXor ? "1" : "0";
+                                                                                                                    operacion = "nula";
+
+                                                                                                                }else if(operacion.equals("or")) {
+                                                                                                                    boolean primerValor = cadenaNumeros.equals("1");
+                                                                                                                    boolean segundoValor = primerNumero == 1.0;
+                                                                                                                    boolean resultadoOr = primerValor || segundoValor;
+                                                                                                                    LabelResult.setText(String.valueOf(resultadoOr));
+                                                                                                                    cadenaNumeros = resultadoOr ? "1" : "0";
+                                                                                                                    operacion = "nula";
+
+                                                                                                                }else if(operacion.equals("not")) {
+                                                                                                                    if (!cadenaNumeros.isEmpty()) {
+                                                                                                                        // Verifica si cadenaNumeros no está vacía y realiza la operación NOT.
+                                                                                                                        double numeroActual = Double.parseDouble(cadenaNumeros);
+                                                                                                                        double resultadoNot = (numeroActual == 0.0) ? 1.0 : 0.0; // NOT del valor actual
+                                                                                                                        cadenaNumeros = String.valueOf(resultadoNot);
+                                                                                                                        LabelResult.setText(cadenaNumeros);
+                                                                                                                    } else {
+                                                                                                                        // Si cadenaNumeros está vacía, considera que la operación NOT se aplica a 0 por defecto.
+                                                                                                                        cadenaNumeros = "1";
+                                                                                                                        LabelResult.setText(cadenaNumeros);
+                                                                                                                    }
+                                                                                                                    operacion = "nula";
                                                                                                                 }
+
                                                                                                                 labelOperation.setText("");
                                                                                                                 activado= true;
+                                                                                                                punto= false;
 
                                                                                                             }
                                                                                                         });
